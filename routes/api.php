@@ -43,7 +43,6 @@ Route::delete(
     [TasController::class, 'deletePhoto']
 );
 
-Route::post('/login', [
-    AuthController::class,
-    'login'
-]);
+Route::get('/health', function () {
+    return 'OK';
+});

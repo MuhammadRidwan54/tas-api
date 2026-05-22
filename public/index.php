@@ -2,7 +2,7 @@
 
 if (!file_exists(public_path('storage'))) {
 
-    app('files')->link(
+    symlink(
         storage_path('app/public'),
         public_path('storage')
     );

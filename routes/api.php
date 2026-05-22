@@ -30,7 +30,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::get('/tas', [TasController::class, 'index']);
 Route::post('/tas', [TasController::class, 'store']);
 Route::get('/tas/{id}', [TasController::class, 'show']);
-Route::post('/tas/{id}', [TasController::class, 'update']);
+Route::put('/tas/{id}', [TasController::class, 'update']);
 Route::delete('/tas/{id}', [TasController::class, 'destroy']);
 
 Route::post(

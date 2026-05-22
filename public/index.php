@@ -1,13 +1,5 @@
 <?php
 
-if (!file_exists(public_path('storage'))) {
-
-    symlink(
-        storage_path('app/public'),
-        public_path('storage')
-    );
-}
-
 use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Http\Request;
 

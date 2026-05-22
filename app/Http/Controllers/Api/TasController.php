@@ -50,6 +50,8 @@ class TasController extends Controller
                     time() . '.' .
                     $file->extension();
 
+                Log::info($namaFile);
+
                 $file->move(
                     public_path('tas'),
                     $namaFile

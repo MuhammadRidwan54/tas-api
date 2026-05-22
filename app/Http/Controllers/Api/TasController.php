@@ -50,8 +50,8 @@ class TasController extends Controller
                     time() . '.' .
                     $file->extension();
 
-                $file->storeAs(
-                    'public/tas',
+                $file->move(
+                    public_path('tas'),
                     $namaFile
                 );
 
@@ -116,8 +116,8 @@ class TasController extends Controller
                 $namaFile =
                     time().'.'.$file->extension();
 
-                $file->storeAs(
-                    'public/tas',
+                $file->move(
+                    public_path('tas'),
                     $namaFile
                 );
 
@@ -140,8 +140,8 @@ class TasController extends Controller
         $photo = FotoTas::findOrFail($id);
 
         $path =
-            storage_path(
-                'app/public/tas/' . $photo->foto
+            public_path(
+                'tas/' . $photo->foto
             );
 
         if (file_exists($path)) {

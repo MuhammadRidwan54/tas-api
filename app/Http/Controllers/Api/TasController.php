@@ -50,7 +50,7 @@ class TasController extends Controller
             foreach ($files as $file) {
 
                 $namaFile =
-                    time().'_'.$file->getClientOriginalName();
+                    uniqid().'_'.$file->getClientOriginalName();
 
                 $file->move(
                     public_path('uploads'),

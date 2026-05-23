@@ -111,11 +111,14 @@ class TasController extends Controller
     {
         $tas = Tas::findOrFail($id);
 
+        Log::info($request->all());
+        Log::info($request->file());
+
         if ($request->hasFile('foto')) {
 
             $files = $request->file('foto');
 
-            // pastikan selalu array
+            // kalau cuma 1 file
             if (!is_array($files)) {
                 $files = [$files];
             }
@@ -136,11 +139,15 @@ class TasController extends Controller
                     'foto' => $url
                 ]);
             }
+
+            return response()->json([
+                'message' => 'Foto berhasil ditambah'
+            ]);
         }
 
         return response()->json([
-            'message' => 'Foto berhasil ditambah'
-        ]);
+            'message' => 'File tidak ditemukan'
+        ], 400);
     }
 
     public function deletePhoto($id)

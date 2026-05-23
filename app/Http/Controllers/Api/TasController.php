@@ -37,24 +37,29 @@ class TasController extends Controller
             'kategori' => $request->kategori
         ]);
 
-        if ($request->file('foto')) {
+        Log::info($request->all());
+
+        if ($request->hasFile('foto')) {
 
             $files = $request->file('foto');
 
+            if (!is_array($files)) {
+                $files = [$files];
+            }
+
             foreach ($files as $file) {
 
-                $uploadedFile = Cloudinary::upload(
-                    $file->getRealPath(),
-                    [
-                        'folder' => 'tas'
-                    ]
-                );
+                $namaFile =
+                    time().'_'.$file->getClientOriginalName();
 
-                $url = $uploadedFile->getSecurePath();
+                $file->move(
+                    public_path('uploads'),
+                    $namaFile
+                );
 
                 FotoTas::create([
                     'tas_id' => $tas->id,
-                    'foto' => $url
+                    'foto' => $namaFile
                 ]);
             }
         }

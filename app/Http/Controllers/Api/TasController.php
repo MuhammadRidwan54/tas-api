@@ -47,19 +47,28 @@ class TasController extends Controller
 
             foreach ($files as $file) {
 
-                $uploadedFile = (new UploadApi())->upload(
-                    $file->getRealPath(),
-                    [
-                        'folder' => 'tas'
-                    ]
-                );
+                try {
 
-                $url = $uploadedFile['secure_url'];
+                    $uploadedFile = (new UploadApi())->upload(
+                        $file->getRealPath(),
+                        [
+                            'folder' => 'tas'
+                        ]
+                    );
 
-                FotoTas::create([
-                    'tas_id' => $tas->id,
-                    'foto' => $url
-                ]);
+                    $url = $uploadedFile['secure_url'];
+
+                    FotoTas::create([
+                        'tas_id' => $tas->id,
+                        'foto' => $url
+                    ]);
+
+                } catch (\Throwable $e) {
+
+                    return response()->json([
+                        'cloudinary_error' => $e->getMessage()
+                    ], 500);
+                }
             }
         }
 

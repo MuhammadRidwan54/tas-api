@@ -117,18 +117,6 @@ class TasController extends Controller
     public function addPhoto(Request $request, $id)
     {
         try {
-            // DEBUG SEMENTARA
-            $cloudName = env('CLOUDINARY_CLOUD_NAME');
-            $apiKey    = env('CLOUDINARY_API_KEY');
-            
-            if (!$cloudName || !$apiKey) {
-                return response()->json([
-                    'error'      => 'ENV tidak terbaca di Railway',
-                    'cloud_name' => $cloudName ?? 'NULL',
-                    'api_key'    => $apiKey ? 'ADA' : 'NULL',
-                ], 500);
-            }
-            // END DEBUG
 
             $tas = Tas::findOrFail($id);
 

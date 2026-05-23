@@ -7,7 +7,8 @@ use App\Models\Tas;
 use App\Models\FotoTas;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use Cloudinary\Api\Upload\UploadApi;
+use Cloudinary\Cloudinary;
+use Cloudinary\Configuration\Configuration;
 
 class TasController extends Controller
 {
@@ -49,13 +50,11 @@ class TasController extends Controller
 
                 try {
 
-                    $uploadedFile = (new UploadApi())->upload(
+                    $cloudinary = $this->getCloudinary();
+                    $uploadedFile = $cloudinary->uploadApi()->upload(
                         $file->getRealPath(),
-                        [
-                            'folder' => 'tas'
-                        ]
+                        ['folder' => 'tas']
                     );
-
                     $url = $uploadedFile['secure_url'];
 
                     FotoTas::create([
@@ -135,13 +134,11 @@ class TasController extends Controller
 
             foreach ($files as $file) {
 
-                $uploadedFile = (new UploadApi())->upload(
+                $cloudinary = $this->getCloudinary();
+                $uploadedFile = $cloudinary->uploadApi()->upload(
                     $file->getRealPath(),
-                    [
-                        'folder' => 'tas'
-                    ]
+                    ['folder' => 'tas']
                 );
-
                 $url = $uploadedFile['secure_url'];
 
                 FotoTas::create([
@@ -172,5 +169,19 @@ class TasController extends Controller
         return response()->json([
             'message' => 'Foto dihapus'
         ]);
+    }
+
+    private function getCloudinary(): Cloudinary
+    {
+        return new Cloudinary(
+            Configuration::instance([
+                'cloud' => [
+                    'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
+                    'api_key'    => env('CLOUDINARY_API_KEY'),
+                    'api_secret' => env('CLOUDINARY_API_SECRET'),
+                ],
+                'url' => ['secure' => true]
+            ])
+        );
     }
 }

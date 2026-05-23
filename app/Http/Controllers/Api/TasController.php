@@ -113,7 +113,14 @@ class TasController extends Controller
 
         if ($request->hasFile('foto')) {
 
-            foreach ($request->file('foto') as $file) {
+            $files = $request->file('foto');
+
+            // pastikan selalu array
+            if (!is_array($files)) {
+                $files = [$files];
+            }
+
+            foreach ($files as $file) {
 
                 $uploadedFile = Cloudinary::upload(
                     $file->getRealPath(),
@@ -122,13 +129,10 @@ class TasController extends Controller
                     ]
                 );
 
-                $url = $uploadedFile
-                    ->getSecurePath();
+                $url = $uploadedFile->getSecurePath();
 
                 FotoTas::create([
-
                     'tas_id' => $tas->id,
-
                     'foto' => $url
                 ]);
             }

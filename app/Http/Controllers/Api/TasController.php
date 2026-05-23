@@ -113,20 +113,14 @@ class TasController extends Controller
 
             $tas = Tas::findOrFail($id);
 
-            Log::info('REQUEST FILE', [
-                'files' => $request->file('foto')
-            ]);
-
             if (!$request->hasFile('foto')) {
-
                 return response()->json([
-                    'message' => 'File tidak ditemukan'
+                    'message' => 'No file uploaded'
                 ], 400);
             }
 
             $files = $request->file('foto');
 
-            // kalau hanya 1 file
             if (!is_array($files)) {
                 $files = [$files];
             }
@@ -152,18 +146,13 @@ class TasController extends Controller
                 'message' => 'Foto berhasil ditambah'
             ]);
 
-        } catch (\Exception $e) {
-
-            Log::error('UPLOAD ERROR', [
-                'message' => $e->getMessage()
-            ]);
+        } catch (\Throwable $e) {
 
             return response()->json([
-                'message' => $e->getMessage()
+                'error' => $e->getMessage()
             ], 500);
         }
     }
-
     public function deletePhoto($id)
     {
         $photo = FotoTas::findOrFail($id);

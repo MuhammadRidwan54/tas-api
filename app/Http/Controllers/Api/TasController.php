@@ -7,6 +7,7 @@ use App\Models\Tas;
 use App\Models\FotoTas;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
 class TasController extends Controller
 {
@@ -46,20 +47,21 @@ class TasController extends Controller
 
             foreach ($files as $file) {
 
-                $namaFile =
-                    time() . '.' .
-                    $file->extension();
-
-                Log::info($namaFile);
-
-                $file->move(
-                    public_path('tas'),
-                    $namaFile
+                $uploadedFile = Cloudinary::upload(
+                    $file->getRealPath(),
+                    [
+                        'folder' => 'tas'
+                    ]
                 );
 
+                $url = $uploadedFile
+                    ->getSecurePath();
+
                 FotoTas::create([
+
                     'tas_id' => $tas->id,
-                    'foto' => $namaFile
+
+                    'foto' => $url
                 ]);
             }
         }
@@ -115,19 +117,21 @@ class TasController extends Controller
 
             foreach ($request->file('foto') as $file) {
 
-                $namaFile =
-                    time().'.'.$file->extension();
-
-                $file->move(
-                    public_path('tas'),
-                    $namaFile
+                $uploadedFile = Cloudinary::upload(
+                    $file->getRealPath(),
+                    [
+                        'folder' => 'tas'
+                    ]
                 );
+
+                $url = $uploadedFile
+                    ->getSecurePath();
 
                 FotoTas::create([
 
                     'tas_id' => $tas->id,
 
-                    'foto' => $namaFile
+                    'foto' => $url
                 ]);
             }
         }
@@ -140,16 +144,6 @@ class TasController extends Controller
     public function deletePhoto($id)
     {
         $photo = FotoTas::findOrFail($id);
-
-        $path =
-            public_path(
-                'tas/' . $photo->foto
-            );
-
-        if (file_exists($path)) {
-
-            unlink($path);
-        }
 
         $photo->delete();
 

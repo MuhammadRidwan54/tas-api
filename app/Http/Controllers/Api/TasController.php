@@ -109,16 +109,24 @@ class TasController extends Controller
 
     public function addPhoto(Request $request, $id)
     {
-        $tas = Tas::findOrFail($id);
+        try {
 
-        Log::info($request->all());
-        Log::info($request->file());
+            $tas = Tas::findOrFail($id);
 
-        if ($request->hasFile('foto')) {
+            Log::info('REQUEST FILE', [
+                'files' => $request->file('foto')
+            ]);
+
+            if (!$request->hasFile('foto')) {
+
+                return response()->json([
+                    'message' => 'File tidak ditemukan'
+                ], 400);
+            }
 
             $files = $request->file('foto');
 
-            // kalau cuma 1 file
+            // kalau hanya 1 file
             if (!is_array($files)) {
                 $files = [$files];
             }
@@ -143,11 +151,17 @@ class TasController extends Controller
             return response()->json([
                 'message' => 'Foto berhasil ditambah'
             ]);
-        }
 
-        return response()->json([
-            'message' => 'File tidak ditemukan'
-        ], 400);
+        } catch (\Exception $e) {
+
+            Log::error('UPLOAD ERROR', [
+                'message' => $e->getMessage()
+            ]);
+
+            return response()->json([
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
 
     public function deletePhoto($id)

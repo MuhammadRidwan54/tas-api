@@ -7,7 +7,7 @@ use App\Models\Tas;
 use App\Models\FotoTas;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
+use Cloudinary\Cloudinary;
 
 class TasController extends Controller
 {
@@ -114,10 +114,22 @@ class TasController extends Controller
             $tas = Tas::findOrFail($id);
 
             if (!$request->hasFile('foto')) {
+
                 return response()->json([
                     'message' => 'No file uploaded'
                 ], 400);
             }
+
+            $cloudinary = new Cloudinary([
+                'cloud' => [
+                    'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
+                    'api_key'    => env('CLOUDINARY_API_KEY'),
+                    'api_secret' => env('CLOUDINARY_API_SECRET'),
+                ],
+                'url' => [
+                    'secure' => true
+                ]
+            ]);
 
             $files = $request->file('foto');
 
@@ -127,14 +139,16 @@ class TasController extends Controller
 
             foreach ($files as $file) {
 
-                $uploadedFile = Cloudinary::upload(
-                    $file->getRealPath(),
-                    [
-                        'folder' => 'tas'
-                    ]
-                );
+                $upload = $cloudinary
+                    ->uploadApi()
+                    ->upload(
+                        $file->getRealPath(),
+                        [
+                            'folder' => 'tas'
+                        ]
+                    );
 
-                $url = $uploadedFile->getSecurePath();
+                $url = $upload['secure_url'];
 
                 FotoTas::create([
                     'tas_id' => $tas->id,
@@ -153,6 +167,8 @@ class TasController extends Controller
             ], 500);
         }
     }
+
+    
     public function deletePhoto($id)
     {
         $photo = FotoTas::findOrFail($id);

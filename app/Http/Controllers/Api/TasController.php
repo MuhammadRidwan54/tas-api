@@ -117,6 +117,18 @@ class TasController extends Controller
     public function addPhoto(Request $request, $id)
     {
         try {
+            // DEBUG SEMENTARA
+            $cloudName = env('CLOUDINARY_CLOUD_NAME');
+            $apiKey    = env('CLOUDINARY_API_KEY');
+            
+            if (!$cloudName || !$apiKey) {
+                return response()->json([
+                    'error'      => 'ENV tidak terbaca di Railway',
+                    'cloud_name' => $cloudName ?? 'NULL',
+                    'api_key'    => $apiKey ? 'ADA' : 'NULL',
+                ], 500);
+            }
+            // END DEBUG
 
             $tas = Tas::findOrFail($id);
 
@@ -127,14 +139,10 @@ class TasController extends Controller
             }
 
             $files = $request->file('foto');
-
-            if (!is_array($files)) {
-                $files = [$files];
-            }
+            if (!is_array($files)) $files = [$files];
 
             foreach ($files as $file) {
-
-                $cloudinary = $this->getCloudinary();
+                $cloudinary  = $this->getCloudinary();
                 $uploadedFile = $cloudinary->uploadApi()->upload(
                     $file->getRealPath(),
                     ['folder' => 'tas']
@@ -143,19 +151,14 @@ class TasController extends Controller
 
                 FotoTas::create([
                     'tas_id' => $tas->id,
-                    'foto' => $url
+                    'foto'   => $url
                 ]);
             }
 
-            return response()->json([
-                'message' => 'Foto berhasil ditambah'
-            ]);
+            return response()->json(['message' => 'Foto berhasil ditambah']);
 
         } catch (\Throwable $e) {
-
-            return response()->json([
-                'error' => $e->getMessage()
-            ], 500);
+            return response()->json(['error' => $e->getMessage()], 500);
         }
     }
 

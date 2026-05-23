@@ -7,7 +7,7 @@ use App\Models\Tas;
 use App\Models\FotoTas;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use Cloudinary\Cloudinary;
+use Cloudinary\Api\Upload\UploadApi;
 
 class TasController extends Controller
 {
@@ -47,18 +47,7 @@ class TasController extends Controller
 
             foreach ($files as $file) {
 
-                $cloudinary = new Cloudinary([
-                    'cloud' => [
-                        'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
-                        'api_key'    => env('CLOUDINARY_API_KEY'),
-                        'api_secret' => env('CLOUDINARY_API_SECRET'),
-                    ],
-                    'url' => [
-                        'secure' => true
-                    ]
-                ]);
-
-                $uploadedFile = $cloudinary->uploadApi()->upload(
+                $uploadedFile = (new UploadApi())->upload(
                     $file->getRealPath(),
                     [
                         'folder' => 'tas'
@@ -137,18 +126,7 @@ class TasController extends Controller
 
             foreach ($files as $file) {
 
-                $cloudinary = new Cloudinary([
-                    'cloud' => [
-                        'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
-                        'api_key'    => env('CLOUDINARY_API_KEY'),
-                        'api_secret' => env('CLOUDINARY_API_SECRET'),
-                    ],
-                    'url' => [
-                        'secure' => true
-                    ]
-                ]);
-
-                $uploadedFile = $cloudinary->uploadApi()->upload(
+                $uploadedFile = (new UploadApi())->upload(
                     $file->getRealPath(),
                     [
                         'folder' => 'tas'

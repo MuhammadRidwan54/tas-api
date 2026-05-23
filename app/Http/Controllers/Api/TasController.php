@@ -37,8 +37,6 @@ class TasController extends Controller
             'kategori' => $request->kategori
         ]);
 
-        Log::info($request->all());
-
         if ($request->hasFile('foto')) {
 
             $files = $request->file('foto');
@@ -49,17 +47,18 @@ class TasController extends Controller
 
             foreach ($files as $file) {
 
-                $namaFile =
-                    uniqid().'_'.$file->getClientOriginalName();
-
-                $file->move(
-                    public_path('uploads'),
-                    $namaFile
+                $uploadedFile = (new Cloudinary())->uploadApi()->upload(
+                    $file->getRealPath(),
+                    [
+                        'folder' => 'tas'
+                    ]
                 );
+
+                $url = $uploadedFile['secure_url'];
 
                 FotoTas::create([
                     'tas_id' => $tas->id,
-                    'foto' => $namaFile
+                    'foto' => $url
                 ]);
             }
         }
@@ -114,22 +113,10 @@ class TasController extends Controller
             $tas = Tas::findOrFail($id);
 
             if (!$request->hasFile('foto')) {
-
                 return response()->json([
                     'message' => 'No file uploaded'
                 ], 400);
             }
-
-            $cloudinary = new Cloudinary([
-                'cloud' => [
-                    'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
-                    'api_key'    => env('CLOUDINARY_API_KEY'),
-                    'api_secret' => env('CLOUDINARY_API_SECRET'),
-                ],
-                'url' => [
-                    'secure' => true
-                ]
-            ]);
 
             $files = $request->file('foto');
 
@@ -139,23 +126,19 @@ class TasController extends Controller
 
             foreach ($files as $file) {
 
-                $upload = $cloudinary
-                    ->uploadApi()
-                    ->upload(
-                        $file->getRealPath(),
-                        [
-                            'folder' => 'tas'
-                        ]
-                    );
+                $uploadedFile = (new Cloudinary())->uploadApi()->upload(
+                    $file->getRealPath(),
+                    [
+                        'folder' => 'tas'
+                    ]
+                );
 
-                $url = $upload['secure_url'];
+                $url = $uploadedFile['secure_url'];
 
-                $photo = FotoTas::create([
+                FotoTas::create([
                     'tas_id' => $tas->id,
                     'foto' => $url
                 ]);
-
-                Log::info($photo);
             }
 
             return response()->json([

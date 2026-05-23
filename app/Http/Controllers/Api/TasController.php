@@ -47,7 +47,18 @@ class TasController extends Controller
 
             foreach ($files as $file) {
 
-                $uploadedFile = (new Cloudinary())->uploadApi()->upload(
+                $cloudinary = new Cloudinary([
+                    'cloud' => [
+                        'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
+                        'api_key'    => env('CLOUDINARY_API_KEY'),
+                        'api_secret' => env('CLOUDINARY_API_SECRET'),
+                    ],
+                    'url' => [
+                        'secure' => true
+                    ]
+                ]);
+
+                $uploadedFile = $cloudinary->uploadApi()->upload(
                     $file->getRealPath(),
                     [
                         'folder' => 'tas'
@@ -126,7 +137,18 @@ class TasController extends Controller
 
             foreach ($files as $file) {
 
-                $uploadedFile = (new Cloudinary())->uploadApi()->upload(
+                $cloudinary = new Cloudinary([
+                    'cloud' => [
+                        'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
+                        'api_key'    => env('CLOUDINARY_API_KEY'),
+                        'api_secret' => env('CLOUDINARY_API_SECRET'),
+                    ],
+                    'url' => [
+                        'secure' => true
+                    ]
+                ]);
+
+                $uploadedFile = $cloudinary->uploadApi()->upload(
                     $file->getRealPath(),
                     [
                         'folder' => 'tas'

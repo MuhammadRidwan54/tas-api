@@ -37,13 +37,9 @@ class TasController extends Controller
             'kategori' => $request->kategori
         ]);
 
-        if ($request->hasFile('foto')) {
+        if ($request->file('foto')) {
 
             $files = $request->file('foto');
-
-            if (!is_array($files)) {
-                $files = [$files];
-            }
 
             foreach ($files as $file) {
 
@@ -54,13 +50,10 @@ class TasController extends Controller
                     ]
                 );
 
-                $url = $uploadedFile
-                    ->getSecurePath();
+                $url = $uploadedFile->getSecurePath();
 
                 FotoTas::create([
-
                     'tas_id' => $tas->id,
-
                     'foto' => $url
                 ]);
             }

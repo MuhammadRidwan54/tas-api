@@ -150,10 +150,12 @@ class TasController extends Controller
 
                 $url = $upload['secure_url'];
 
-                FotoTas::create([
+                $photo = FotoTas::create([
                     'tas_id' => $tas->id,
                     'foto' => $url
                 ]);
+
+                Log::info($photo);
             }
 
             return response()->json([
@@ -168,7 +170,7 @@ class TasController extends Controller
         }
     }
 
-    
+
     public function deletePhoto($id)
     {
         $photo = FotoTas::findOrFail($id);

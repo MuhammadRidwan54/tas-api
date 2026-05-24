@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
@@ -36,5 +37,40 @@ class AuthController extends Controller
 
             'user' => $user
         ]);
+    }
+
+    public function getUsers()
+    {
+        $users = User::select('id', 'name', 'email', 'role')->get();
+        return response()->json($users);
+    }
+
+    public function createUser(Request $request)
+    {
+        $request->validate([
+            'name'     => 'required',
+            'email'    => 'required|email|unique:users',
+            'password' => 'required|min:6',
+            'role'     => 'required|in:admin,boss'
+        ]);
+
+        $user = User::create([
+            'name'     => $request->name,
+            'email'    => $request->email,
+            'password' => Hash::make($request->password),
+            'role'     => $request->role
+        ]);
+
+        return response()->json([
+            'message' => 'User berhasil dibuat',
+            'user'    => $user
+        ], 201);
+    }
+
+    public function deleteUser($id)
+    {
+        $user = User::findOrFail($id);
+        $user->delete();
+        return response()->json(['message' => 'User berhasil dihapus']);
     }
 }

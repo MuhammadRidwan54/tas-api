@@ -38,6 +38,10 @@ Route::post(
     [TasController::class, 'addPhoto']
 );
 
+Route::get('/users',        [AuthController::class, 'getUsers']);
+Route::post('/users',       [AuthController::class, 'createUser']);
+Route::delete('/users/{id}',[AuthController::class, 'deleteUser']);
+
 Route::delete(
     '/photo/{id}',
     [TasController::class, 'deletePhoto']

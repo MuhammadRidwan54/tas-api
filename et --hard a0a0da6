@@ -1,0 +1,42 @@
+[33m1f70b2b[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m upload apk
+[33md1115da[m Fix formatting in Procfile command
+[33m0bd6086[m add migrate on deploy
+[33m5af325f[m cli railway
+[33ma0a0da6[m new update 1.1
+[33mf30aa22[m[33m ([m[1;33mtag: [m[1;33mv3.0[m[33m, [m[1;33mtag: [m[1;33mv2.0[m[33m)[m tambah endpoint kelola user
+[33mb2dd664[m[33m ([m[1;33mtag: [m[1;33mv1.0[m[33m)[m fix cloudinary
+[33m77a5340[m fix cloudinary
+[33md6dacda[m fix cloudinary
+[33mfdd390c[m fix cloudinary upload
+[33md6f149d[m fix cloudinary upload
+[33mc919255[m fix cloudinary config
+[33m9f79aa0[m fix cloudinary upload
+[33m0a2c64f[m fix cloudinary upload
+[33mbb3c468[m fix cloudinary upload
+[33ma81b0f0[m replace cloudinary package
+[33m372df41[m fix cloudinary config
+[33mb9d8b31[m install cloudinary laravel
+[33m85396c9[m tas controller done lebih 1 foto
+[33maed4d96[m tas controller done lebih 1 foto
+[33m973ce81[m tas controller done lebih 1 foto
+[33mea6ae7d[m tas controller done lebih 1 foto
+[33mef9a1c7[m use public uploads
+[33m2b50fe6[m fix cloudinary upload
+[33mbc3faf0[m cloudinary upload
+[33m5799ff2[m rollback index
+[33m4ceebb9[m fix storage symlink
+[33me6537a2[m fix storage link railway
+[33m502b424[m fix update route
+[33m17bb1e6[m fix railway image storage
+[33m8a1846d[m fix storage
+[33m2396a11[m fix railway laravel start
+[33mc2cdc0a[m fix login api route
+[33md385c9e[m add adminseed
+[33m90e41f1[m change php version
+[33m47797bc[m add railpack config
+[33m52cc177[m remove nixpacks
+[33mccd68bb[m add nixpacks config
+[33mece6fab[m fix railway docker
+[33ma74a51b[m fix docker railway
+[33m086698a[m add dockerfile
+[33me659336[m first commit

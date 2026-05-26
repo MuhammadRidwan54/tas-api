@@ -55,6 +55,8 @@ Route::get('/app/version', function () {
     ]);
 });
 
+Route::post('/users/last-seen', [AuthController::class, 'updateLastSeen']);
+
 Route::get('/health', function () {
     return 'OK';
 });

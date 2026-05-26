@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Carbon\Carbon;
 
 class AuthController extends Controller
 {
@@ -27,6 +28,9 @@ class AuthController extends Controller
             $request->email
         )->first();
 
+        // Catat waktu login
+        $user->update(['last_seen' => Carbon::now()]);
+
         $token = $user
             ->createToken('token')
             ->plainTextToken;
@@ -39,9 +43,19 @@ class AuthController extends Controller
         ]);
     }
 
+    // Tambah method baru — update last_seen saat app aktif
+    public function updateLastSeen(Request $request)
+    {
+        $user = User::where('email', $request->email)->first();
+        if ($user) {
+            $user->update(['last_seen' => Carbon::now()]);
+        }
+        return response()->json(['message' => 'ok']);
+    }
+
     public function getUsers()
     {
-        $users = User::select('id', 'name', 'email', 'role')->get();
+        $users = User::select('id', 'name', 'email', 'role', 'last_seen')->get();
         return response()->json($users);
     }
 

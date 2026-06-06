@@ -62,18 +62,19 @@ Route::get('/health', function () {
     return 'OK';
 });
 
-Route::get('/migrate', function() {
+// ENDPOINT KHUSUS UNTUK MEMPERBAIKI ERROR 500 - HAPUS SETELAH SUKSES
+Route::get('/fix-role-migration', function() {
     try {
-        Artisan::call('migrate', ['--force' => true]);
+        // Jalankan hanya migrasi untuk file add_role_to_users_table
+        \Illuminate\Support\Facades\Artisan::call('migrate --force --path=database/migrations/2026_05_20_152423_add_role_to_users_table.php');
         return response()->json([
-            'message' => 'Migration success',
-            'output' => Artisan::output()
+            'status' => 'Migration executed',
+            'output' => \Illuminate\Support\Facades\Artisan::output()
         ]);
     } catch (\Exception $e) {
         return response()->json([
             'error' => $e->getMessage(),
-            'line' => $e->getLine(),
-            'file' => $e->getFile()
+            'trace' => $e->getTraceAsString()
         ], 500);
     }
 });

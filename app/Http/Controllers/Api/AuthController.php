@@ -41,22 +41,8 @@ class AuthController extends Controller
 
     public function getUsers()
     {
-        try {
-            // Coba ambil semua data user tanpa select spesifik dulu
-            $users = User::all();
-            
-            return response()->json([
-                'success' => true,
-                'data' => $users
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'error' => $e->getMessage(),
-                'line' => $e->getLine(),
-                'file' => $e->getFile()
-            ], 500);
-        }
+        $users = User::select('id', 'name', 'email', 'role')->get();
+        return response()->json($users);  // ← LANGSUNG ARRAY
     }
 
     public function createUser(Request $request)

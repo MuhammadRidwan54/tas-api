@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\TasController;
 use App\Http\Controllers\Api\AuthController;
+use Illuminate\Support\Facades\Artisan;
 
 
 
@@ -59,4 +60,20 @@ Route::post('/users/last-seen', [AuthController::class, 'updateLastSeen']);
 
 Route::get('/health', function () {
     return 'OK';
+});
+
+Route::get('/migrate', function() {
+    try {
+        Artisan::call('migrate', ['--force' => true]);
+        return response()->json([
+            'message' => 'Migration success',
+            'output' => Artisan::output()
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => $e->getMessage(),
+            'line' => $e->getLine(),
+            'file' => $e->getFile()
+        ], 500);
+    }
 });

@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\TasController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\NotificationController;
 use Illuminate\Support\Facades\Artisan;
 
 
@@ -38,6 +39,14 @@ Route::post(
     '/tas/{id}/photo',
     [TasController::class, 'addPhoto']
 );
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/fcm-token', [NotificationController::class, 'saveFcmToken']);
+    Route::get('/notifications', [NotificationController::class, 'getNotifications']);
+    Route::patch('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
+    Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead']);
+    Route::get('/notifications/unread-count', [NotificationController::class, 'unreadCount']);
+});
 
 Route::get('/users',        [AuthController::class, 'getUsers']);
 Route::post('/users',       [AuthController::class, 'createUser']);

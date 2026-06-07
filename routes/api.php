@@ -122,3 +122,10 @@ Route::get('/debug-notifications', function () {
         ], 500);
     }
 });
+
+Route::get('/clear-cache', function() {
+    Artisan::call('config:clear');
+    Artisan::call('cache:clear');
+    Artisan::call('optimize:clear');
+    return 'Cache cleared';
+});

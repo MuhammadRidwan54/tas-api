@@ -30,7 +30,12 @@ class NotificationController extends Controller
     public function getNotifications(Request $request)
     {
         try {
+            // Log awal
+            \Log::info('getNotifications called');
+            
             $user = Auth::user();
+            \Log::info('User: ' . ($user ? $user->id : 'null'));
+            
             if (!$user) {
                 return response()->json(['error' => 'Unauthorized'], 401);
             }
@@ -40,10 +45,20 @@ class NotificationController extends Controller
                 ->orderBy('created_at', 'desc')
                 ->get();
             
+            \Log::info('Notifications count: ' . $notifications->count());
+            
             return response()->json($notifications);
+            
         } catch (\Exception $e) {
-            Log::error('getNotifications error: ' . $e->getMessage() . ' in ' . $e->getFile() . ' line ' . $e->getLine());
-            return response()->json(['error' => $e->getMessage()], 500);
+            \Log::error('getNotifications error: ' . $e->getMessage());
+            \Log::error('File: ' . $e->getFile() . ' Line: ' . $e->getLine());
+            \Log::error('Trace: ' . $e->getTraceAsString());
+            
+            return response()->json([
+                'error' => $e->getMessage(),
+                'file' => basename($e->getFile()),
+                'line' => $e->getLine()
+            ], 500);
         }
     }
 

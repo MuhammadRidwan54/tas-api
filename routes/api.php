@@ -6,6 +6,9 @@ use App\Http\Controllers\Api\TasController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\NotificationController;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 
 
@@ -82,3 +85,40 @@ Route::get('/health', function () {
 //         return response()->json(['error' => $e->getMessage()], 500);
 //     }
 // });
+
+Route::get('/debug-notifications', function () {
+    try {
+        $user = Auth::user();
+        
+        if (!$user) {
+            return response()->json(['error' => 'No user logged in'], 401);
+        }
+        
+        // Cek tabel notifications
+        $hasTable = Schema::hasTable('notifications');
+        
+        // Cek kolom fcm_token
+        $hasFcmColumn = Schema::hasColumn('users', 'fcm_token');
+        
+        // Hitung notifikasi
+        $count = DB::table('notifications')->where('user_id', $user->id)->count();
+        
+        // Ambil sample notifikasi
+        $sample = DB::table('notifications')->where('user_id', $user->id)->first();
+        
+        return response()->json([
+            'user_id' => $user->id,
+            'has_notifications_table' => $hasTable,
+            'has_fcm_column' => $hasFcmColumn,
+            'notifications_count' => $count,
+            'sample_notification' => $sample,
+            'table_columns' => $hasTable ? Schema::getColumnListing('notifications') : []
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => $e->getMessage(),
+            'line' => $e->getLine(),
+            'file' => basename($e->getFile())
+        ], 500);
+    }
+});

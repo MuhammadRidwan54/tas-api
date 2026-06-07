@@ -59,7 +59,7 @@ Route::delete(
 
 Route::get('/app/version', function () {
     return response()->json([
-        'version'      => '1.1',  // samakan dengan versionName di build.gradle
+        'version'      => '3.1',  // samakan dengan versionName di build.gradle
         'download_url' => 'https://tas-api-production-7819.up.railway.app/app/BagGallery.apk',
         'notes'        => 'Versi terbaru tersedia'
     ]);

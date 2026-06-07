@@ -29,13 +29,22 @@ class NotificationController extends Controller
 
     public function getNotifications(Request $request)
     {
-        // ✅ PERBAIKAN: return array langsung, bukan object pagination
-        $notifications = Notification::where('user_id', Auth::id())
-            ->with('sender', 'tas')
-            ->orderBy('created_at', 'desc')
-            ->get();
-        
-        return response()->json($notifications);
+        try {
+            $user = Auth::user();
+            if (!$user) {
+                return response()->json(['error' => 'Unauthorized'], 401);
+            }
+
+            $notifications = Notification::where('user_id', $user->id)
+                ->with('sender', 'tas')
+                ->orderBy('created_at', 'desc')
+                ->get();
+            
+            return response()->json($notifications);
+        } catch (\Exception $e) {
+            Log::error('getNotifications error: ' . $e->getMessage() . ' in ' . $e->getFile() . ' line ' . $e->getLine());
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 
     public function markAsRead($id)

@@ -7,8 +7,9 @@ use App\Models\Notification;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Kreait\Firebase\Factory;
-use Kreait\Firebase\Messaging\CloudMessage;
+use Illuminate\Support\Facades\Log;  // ← TAMBAHKAN INI
+use Kreait\Firebase\Factory;  // ← TAMBAHKAN INI
+use Kreait\Firebase\Messaging\CloudMessage;  // ← TAMBAHKAN INI
 use Kreait\Firebase\Messaging\Notification as FirebaseNotification;
 
 class NotificationController extends Controller
@@ -28,11 +29,12 @@ class NotificationController extends Controller
 
     public function getNotifications(Request $request)
     {
+        // ✅ PERBAIKAN: return array langsung, bukan object pagination
         $notifications = Notification::where('user_id', Auth::id())
             ->with('sender', 'tas')
             ->orderBy('created_at', 'desc')
-            ->paginate(20);
-
+            ->get();
+        
         return response()->json($notifications);
     }
 

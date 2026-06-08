@@ -143,3 +143,7 @@ Route::get('/clear-cache', function() {
     Artisan::call('optimize:clear');
     return 'Cache cleared';
 });
+
+Route::get('/ping', function () {
+    return 'pong';
+});

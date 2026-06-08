@@ -36,6 +36,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::patch('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
     Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead']);
     Route::get('/notifications/unread-count', [NotificationController::class, 'unreadCount']);
+
+    // TAMBAHKAN INI - endpoint test auth sederhana
+    Route::get('/auth-test', function () {
+        return response()->json([
+            'user' => Auth::user(),
+            'message' => 'Auth berhasil!'
+        ]);
+    });
 });
 
 Route::get('/users', [AuthController::class, 'getUsers']);

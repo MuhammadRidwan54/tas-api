@@ -206,3 +206,19 @@ Route::get('/check-fcm-column', function() {
         'columns' => Schema::getColumnListing('users')
     ]);
 });
+
+Route::get('/check-user-tokens', function() {
+    $users = DB::table('users')->select('id', 'name', 'email', 'fcm_token')->get();
+    return response()->json($users);
+});
+
+Route::get('/test-notif-to-user1', function() {
+    $user = App\Models\User::find(3); // user1
+    return App\Http\Controllers\Api\NotificationController::sendPushNotification(
+        $user->id,
+        'Test Notifikasi',
+        'Ini notifikasi push untuk user1',
+        'info',
+        null
+    );
+});

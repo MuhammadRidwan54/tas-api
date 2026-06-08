@@ -9,6 +9,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Cloudinary\Cloudinary;
 use Cloudinary\Configuration\Configuration;
+use App\Http\Controllers\Api\NotificationController;
+use App\Models\User;
 
 class TasController extends Controller
 {
@@ -39,17 +41,13 @@ class TasController extends Controller
         ]);
 
         if ($request->hasFile('foto')) {
-
             $files = $request->file('foto');
-
             if (!is_array($files)) {
                 $files = [$files];
             }
 
             foreach ($files as $file) {
-
                 try {
-
                     $cloudinary = $this->getCloudinary();
                     $uploadedFile = $cloudinary->uploadApi()->upload(
                         $file->getRealPath(),
@@ -63,12 +61,24 @@ class TasController extends Controller
                     ]);
 
                 } catch (\Throwable $e) {
-
                     return response()->json([
                         'cloudinary_error' => $e->getMessage()
                     ], 500);
                 }
             }
+        }
+
+        // Kirim notifikasi ke semua user KECUALI admin yang upload
+        $users = User::where('id', '!=', auth()->id())->get();
+        
+        foreach ($users as $user) {
+            NotificationController::sendPushNotification(
+                $user->id,
+                '📢 Tas Baru!',
+                auth()->user()->name . ' menambahkan tas: ' . $request->nama_tas,
+                'success',
+                $tas->id
+            );
         }
 
         return response()->json(

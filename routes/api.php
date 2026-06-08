@@ -179,3 +179,22 @@ Route::get('/clear-tokens', function() {
     DB::table('personal_access_tokens')->truncate();
     return 'All tokens cleared';
 });
+
+// TEMPORARY - Hapus setelah selesai test
+Route::get('/create-notif-for-user1', function() {
+    try {
+        DB::table('notifications')->insert([
+            'user_id' => 1,
+            'sender_id' => 1,
+            'title' => 'Test Notifikasi',
+            'message' => 'Ini notifikasi untuk Admin2',
+            'type' => 'info',
+            'is_read' => 0,
+            'created_at' => now(),
+            'updated_at' => now()
+        ]);
+        return response()->json(['message' => 'Notifikasi dibuat untuk user_id=1']);
+    } catch (\Exception $e) {
+        return response()->json(['error' => $e->getMessage()], 500);
+    }
+});

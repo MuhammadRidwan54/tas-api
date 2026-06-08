@@ -12,33 +12,32 @@ use Illuminate\Support\Facades\DB;
 use Kreait\Firebase\Factory;
 use Kreait\Firebase\Messaging\CloudMessage;
 use Kreait\Firebase\Messaging\Notification as FirebaseNotification;
+use Laravel\Sanctum\PersonalAccessToken;
 
 class NotificationController extends Controller
 {
     public function saveFcmToken(Request $request)
     {
-        // Manual auth
-        $token = $request->bearerToken();
-        if (!$token) {
+        $tokenString = $request->bearerToken();
+        
+        if (!$tokenString) {
             return response()->json(['error' => 'Token tidak ditemukan'], 401);
         }
         
-        $accessToken = DB::table('personal_access_tokens')
-            ->where('token', hash('sha256', $token))
-            ->first();
+        $accessToken = PersonalAccessToken::findToken($tokenString);
         
         if (!$accessToken) {
             return response()->json(['error' => 'Token tidak valid'], 401);
         }
         
-        $user = User::find($accessToken->tokenable_id);
+        $user = $accessToken->tokenable;
+        
         if (!$user) {
             return response()->json(['error' => 'User tidak ditemukan'], 401);
         }
         
         Auth::setUser($user);
         
-        // Kode asli
         $request->validate([
             'fcm_token' => 'required|string'
         ]);
@@ -52,57 +51,49 @@ class NotificationController extends Controller
 
     public function getNotifications(Request $request)
     {
-        $token = $request->bearerToken();
+        $tokenString = $request->bearerToken();
         
-        if (!$token) {
+        if (!$tokenString) {
             return response()->json(['error' => 'Token tidak ditemukan'], 401);
         }
         
-        // Debug: cek semua token yang ada
-        $allTokens = DB::table('personal_access_tokens')->get();
-        
-        // Coba berbagai metode hash
-        $hashedToken1 = hash('sha256', $token);
-        $hashedToken2 = $token; // langsung tanpa hash
-        
-        $accessToken = DB::table('personal_access_tokens')
-            ->where('token', $hashedToken1)
-            ->orWhere('token', $hashedToken2)
-            ->first();
-        
-        return response()->json([
-            'received_token' => $token,
-            'hashed_sha256' => $hashedToken1,
-            'token_length' => strlen($token),
-            'all_tokens_count' => $allTokens->count(),
-            'all_tokens' => $allTokens->map(function($t) {
-                return [
-                    'id' => $t->id,
-                    'token_preview' => substr($t->token, 0, 20) . '...',
-                    'tokenable_id' => $t->tokenable_id
-                ];
-            }),
-            'found_token' => $accessToken ? true : false
-        ]);
-    }
-
-    public function markAsRead(Request $request, $id)
-    {
-        $token = $request->bearerToken();
-        
-        if (!$token) {
-            return response()->json(['error' => 'Token tidak ditemukan'], 401);
-        }
-        
-        $accessToken = DB::table('personal_access_tokens')
-            ->where('token', hash('sha256', $token))
-            ->first();
+        $accessToken = PersonalAccessToken::findToken($tokenString);
         
         if (!$accessToken) {
             return response()->json(['error' => 'Token tidak valid'], 401);
         }
         
-        $user = User::find($accessToken->tokenable_id);
+        $user = $accessToken->tokenable;
+        
+        if (!$user) {
+            return response()->json(['error' => 'User tidak ditemukan'], 401);
+        }
+        
+        Auth::setUser($user);
+        
+        $notifications = Notification::where('user_id', $user->id)
+            ->with('sender', 'tas')
+            ->orderBy('created_at', 'desc')
+            ->get();
+        
+        return response()->json($notifications);
+    }
+
+    public function markAsRead(Request $request, $id)
+    {
+        $tokenString = $request->bearerToken();
+        
+        if (!$tokenString) {
+            return response()->json(['error' => 'Token tidak ditemukan'], 401);
+        }
+        
+        $accessToken = PersonalAccessToken::findToken($tokenString);
+        
+        if (!$accessToken) {
+            return response()->json(['error' => 'Token tidak valid'], 401);
+        }
+        
+        $user = $accessToken->tokenable;
         
         if (!$user) {
             return response()->json(['error' => 'User tidak ditemukan'], 401);
@@ -124,21 +115,19 @@ class NotificationController extends Controller
 
     public function markAllAsRead(Request $request)
     {
-        $token = $request->bearerToken();
+        $tokenString = $request->bearerToken();
         
-        if (!$token) {
+        if (!$tokenString) {
             return response()->json(['error' => 'Token tidak ditemukan'], 401);
         }
         
-        $accessToken = DB::table('personal_access_tokens')
-            ->where('token', hash('sha256', $token))
-            ->first();
+        $accessToken = PersonalAccessToken::findToken($tokenString);
         
         if (!$accessToken) {
             return response()->json(['error' => 'Token tidak valid'], 401);
         }
         
-        $user = User::find($accessToken->tokenable_id);
+        $user = $accessToken->tokenable;
         
         if (!$user) {
             return response()->json(['error' => 'User tidak ditemukan'], 401);
@@ -158,21 +147,19 @@ class NotificationController extends Controller
 
     public function unreadCount(Request $request)
     {
-        $token = $request->bearerToken();
+        $tokenString = $request->bearerToken();
         
-        if (!$token) {
+        if (!$tokenString) {
             return response()->json(['error' => 'Token tidak ditemukan'], 401);
         }
         
-        $accessToken = DB::table('personal_access_tokens')
-            ->where('token', hash('sha256', $token))
-            ->first();
+        $accessToken = PersonalAccessToken::findToken($tokenString);
         
         if (!$accessToken) {
             return response()->json(['error' => 'Token tidak valid'], 401);
         }
         
-        $user = User::find($accessToken->tokenable_id);
+        $user = $accessToken->tokenable;
         
         if (!$user) {
             return response()->json(['error' => 'User tidak ditemukan'], 401);

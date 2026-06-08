@@ -167,3 +167,10 @@ Route::get('/migrate-sanctum', function() {
         return response()->json(['error' => $e->getMessage()], 500);
     }
 });
+
+Route::get('/check-sanctum-table', function() {
+    $hasTable = Schema::hasTable('personal_access_tokens');
+    return response()->json([
+        'personal_access_tokens_table_exists' => $hasTable
+    ]);
+});

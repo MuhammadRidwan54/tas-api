@@ -198,3 +198,11 @@ Route::get('/create-notif-for-user1', function() {
         return response()->json(['error' => $e->getMessage()], 500);
     }
 });
+
+Route::get('/check-fcm-column', function() {
+    $hasColumn = Schema::hasColumn('users', 'fcm_token');
+    return response()->json([
+        'has_fcm_column' => $hasColumn,
+        'columns' => Schema::getColumnListing('users')
+    ]);
+});

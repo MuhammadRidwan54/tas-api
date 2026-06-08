@@ -174,3 +174,8 @@ Route::get('/check-sanctum-table', function() {
         'personal_access_tokens_table_exists' => $hasTable
     ]);
 });
+
+Route::get('/clear-tokens', function() {
+    DB::table('personal_access_tokens')->truncate();
+    return 'All tokens cleared';
+});

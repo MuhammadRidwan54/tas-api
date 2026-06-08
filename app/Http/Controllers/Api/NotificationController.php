@@ -58,28 +58,32 @@ class NotificationController extends Controller
             return response()->json(['error' => 'Token tidak ditemukan'], 401);
         }
         
+        // Debug: cek semua token yang ada
+        $allTokens = DB::table('personal_access_tokens')->get();
+        
+        // Coba berbagai metode hash
+        $hashedToken1 = hash('sha256', $token);
+        $hashedToken2 = $token; // langsung tanpa hash
+        
         $accessToken = DB::table('personal_access_tokens')
-            ->where('token', hash('sha256', $token))
+            ->where('token', $hashedToken1)
+            ->orWhere('token', $hashedToken2)
             ->first();
         
-        if (!$accessToken) {
-            return response()->json(['error' => 'Token tidak valid'], 401);
-        }
-        
-        $user = User::find($accessToken->tokenable_id);
-        
-        if (!$user) {
-            return response()->json(['error' => 'User tidak ditemukan'], 401);
-        }
-        
-        Auth::setUser($user);
-        
-        $notifications = Notification::where('user_id', $user->id)
-            ->with('sender', 'tas')
-            ->orderBy('created_at', 'desc')
-            ->get();
-        
-        return response()->json($notifications);
+        return response()->json([
+            'received_token' => $token,
+            'hashed_sha256' => $hashedToken1,
+            'token_length' => strlen($token),
+            'all_tokens_count' => $allTokens->count(),
+            'all_tokens' => $allTokens->map(function($t) {
+                return [
+                    'id' => $t->id,
+                    'token_preview' => substr($t->token, 0, 20) . '...',
+                    'tokenable_id' => $t->tokenable_id
+                ];
+            }),
+            'found_token' => $accessToken ? true : false
+        ]);
     }
 
     public function markAsRead(Request $request, $id)

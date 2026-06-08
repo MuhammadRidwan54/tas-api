@@ -30,7 +30,7 @@ Route::delete('/tas/{id}', [TasController::class, 'destroy']);
 
 Route::post('/tas/{id}/photo', [TasController::class, 'addPhoto']);
 
-Route::middleware('auth:sanctum')->group(function () {
+// Route::middleware('auth:sanctum')->group(function () {
     Route::post('/fcm-token', [NotificationController::class, 'saveFcmToken']);
     Route::get('/notifications', [NotificationController::class, 'getNotifications']);
     Route::patch('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
@@ -44,7 +44,7 @@ Route::middleware('auth:sanctum')->group(function () {
             'message' => 'Auth berhasil!'
         ]);
     });
-});
+// });
 
 Route::get('/users', [AuthController::class, 'getUsers']);
 Route::post('/users', [AuthController::class, 'createUser']);

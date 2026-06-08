@@ -7,15 +7,38 @@ use App\Models\Notification;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;  // ← TAMBAHKAN INI
-use Kreait\Firebase\Factory;  // ← TAMBAHKAN INI
-use Kreait\Firebase\Messaging\CloudMessage;  // ← TAMBAHKAN INI
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
+use Kreait\Firebase\Factory;
+use Kreait\Firebase\Messaging\CloudMessage;
 use Kreait\Firebase\Messaging\Notification as FirebaseNotification;
 
 class NotificationController extends Controller
 {
     public function saveFcmToken(Request $request)
     {
+        // Manual auth
+        $token = $request->bearerToken();
+        if (!$token) {
+            return response()->json(['error' => 'Token tidak ditemukan'], 401);
+        }
+        
+        $accessToken = DB::table('personal_access_tokens')
+            ->where('token', hash('sha256', $token))
+            ->first();
+        
+        if (!$accessToken) {
+            return response()->json(['error' => 'Token tidak valid'], 401);
+        }
+        
+        $user = User::find($accessToken->tokenable_id);
+        if (!$user) {
+            return response()->json(['error' => 'User tidak ditemukan'], 401);
+        }
+        
+        Auth::setUser($user);
+        
+        // Kode asli
         $request->validate([
             'fcm_token' => 'required|string'
         ]);
@@ -29,41 +52,60 @@ class NotificationController extends Controller
 
     public function getNotifications(Request $request)
     {
-        try {
-            // Log awal
-            \Log::info('getNotifications called');
-            
-            $user = Auth::user();
-            \Log::info('User: ' . ($user ? $user->id : 'null'));
-            
-            if (!$user) {
-                return response()->json(['error' => 'Unauthorized'], 401);
-            }
-
-            $notifications = Notification::where('user_id', $user->id)
-                ->with('sender', 'tas')
-                ->orderBy('created_at', 'desc')
-                ->get();
-            
-            \Log::info('Notifications count: ' . $notifications->count());
-            
-            return response()->json($notifications);
-            
-        } catch (\Exception $e) {
-            \Log::error('getNotifications error: ' . $e->getMessage());
-            \Log::error('File: ' . $e->getFile() . ' Line: ' . $e->getLine());
-            \Log::error('Trace: ' . $e->getTraceAsString());
-            
-            return response()->json([
-                'error' => $e->getMessage(),
-                'file' => basename($e->getFile()),
-                'line' => $e->getLine()
-            ], 500);
+        $token = $request->bearerToken();
+        
+        if (!$token) {
+            return response()->json(['error' => 'Token tidak ditemukan'], 401);
         }
+        
+        $accessToken = DB::table('personal_access_tokens')
+            ->where('token', hash('sha256', $token))
+            ->first();
+        
+        if (!$accessToken) {
+            return response()->json(['error' => 'Token tidak valid'], 401);
+        }
+        
+        $user = User::find($accessToken->tokenable_id);
+        
+        if (!$user) {
+            return response()->json(['error' => 'User tidak ditemukan'], 401);
+        }
+        
+        Auth::setUser($user);
+        
+        $notifications = Notification::where('user_id', $user->id)
+            ->with('sender', 'tas')
+            ->orderBy('created_at', 'desc')
+            ->get();
+        
+        return response()->json($notifications);
     }
 
-    public function markAsRead($id)
+    public function markAsRead(Request $request, $id)
     {
+        $token = $request->bearerToken();
+        
+        if (!$token) {
+            return response()->json(['error' => 'Token tidak ditemukan'], 401);
+        }
+        
+        $accessToken = DB::table('personal_access_tokens')
+            ->where('token', hash('sha256', $token))
+            ->first();
+        
+        if (!$accessToken) {
+            return response()->json(['error' => 'Token tidak valid'], 401);
+        }
+        
+        $user = User::find($accessToken->tokenable_id);
+        
+        if (!$user) {
+            return response()->json(['error' => 'User tidak ditemukan'], 401);
+        }
+        
+        Auth::setUser($user);
+        
         $notification = Notification::where('user_id', Auth::id())
             ->where('id', $id)
             ->firstOrFail();
@@ -76,8 +118,30 @@ class NotificationController extends Controller
         return response()->json(['message' => 'Marked as read']);
     }
 
-    public function markAllAsRead()
+    public function markAllAsRead(Request $request)
     {
+        $token = $request->bearerToken();
+        
+        if (!$token) {
+            return response()->json(['error' => 'Token tidak ditemukan'], 401);
+        }
+        
+        $accessToken = DB::table('personal_access_tokens')
+            ->where('token', hash('sha256', $token))
+            ->first();
+        
+        if (!$accessToken) {
+            return response()->json(['error' => 'Token tidak valid'], 401);
+        }
+        
+        $user = User::find($accessToken->tokenable_id);
+        
+        if (!$user) {
+            return response()->json(['error' => 'User tidak ditemukan'], 401);
+        }
+        
+        Auth::setUser($user);
+        
         Notification::where('user_id', Auth::id())
             ->where('is_read', false)
             ->update([
@@ -88,8 +152,30 @@ class NotificationController extends Controller
         return response()->json(['message' => 'All notifications marked as read']);
     }
 
-    public function unreadCount()
+    public function unreadCount(Request $request)
     {
+        $token = $request->bearerToken();
+        
+        if (!$token) {
+            return response()->json(['error' => 'Token tidak ditemukan'], 401);
+        }
+        
+        $accessToken = DB::table('personal_access_tokens')
+            ->where('token', hash('sha256', $token))
+            ->first();
+        
+        if (!$accessToken) {
+            return response()->json(['error' => 'Token tidak valid'], 401);
+        }
+        
+        $user = User::find($accessToken->tokenable_id);
+        
+        if (!$user) {
+            return response()->json(['error' => 'User tidak ditemukan'], 401);
+        }
+        
+        Auth::setUser($user);
+        
         $count = Notification::where('user_id', Auth::id())
             ->where('is_read', false)
             ->count();
